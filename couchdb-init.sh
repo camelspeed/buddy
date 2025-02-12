@@ -6,7 +6,7 @@ CDB_WAIT=$3
 
 # see: https://docs.couchdb.org/en/stable/install/docker.html
 echo "Starting container as detached.  First time may take some time!"
-docker run -d  --name buddy-db -e COUCHDB_USER=$CDB_USER -e COUCHDB_PASSWORD=$CDB_PWD -p 5984:5984 couchdb:3
+# docker run -d  --name buddy-db -e COUCHDB_USER=$CDB_USER -e COUCHDB_PASSWORD=$CDB_PWD -p 5984:5984 couchdb:3
 
 # make sure container is ready
 echo "Sleeping $CDB_WAIT to allow for container to boot..."
