@@ -1,21 +1,43 @@
 services:
-  # broker:
-  #   image: apache/kafka:latest
-  #   container_name: broker
-  #   environment:
-  #     KAFKA_NODE_ID: 1
-  #     KAFKA_PROCESS_ROLES: broker,controller
-  #     KAFKA_LISTENERS: PLAINTEXT://localhost:9092,CONTROLLER://localhost:9093
-  #     KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
-  #     KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
-  #     KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
-  #     KAFKA_CONTROLLER_QUORUM_VOTERS: 1@localhost:9093
-  #     KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-  #     KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
-  #     KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
-  #     KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
-  #     KAFKA_NUM_PARTITIONS: 3
-  couchdb:
+  broker:
+    image: apache/kafka:latest
+    container_name: buddy-broker
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://localhost:9092,CONTROLLER://localhost:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@localhost:9093
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_NUM_PARTITIONS: 3
+  jobmanager:
+    image: flink:1.20.1-java11
+    container_name: buddy-eng-jm
+    ports:
+      - "8081:8081"
+    command: jobmanager
+    volumes:
+      - buddy-data:/opt/flink/data
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: jobmanager
+  taskmanager:
+    image: flink:1.20.1-java11
+    container_name: buddy-eng-tm
+    command: taskmanager
+    volumes:
+      - buddy-data:/opt/flink/data
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: jobmanager
+  db:
     image: couchdb:latest
     container_name: buddy-db
     restart: unless-stopped
@@ -27,7 +49,7 @@ services:
       - COUCHDB_USER=admin
       - COUCHDB_PASSWORD=password
     volumes:
-      - /opt/couchdb/data
+      - buddy-data:/opt/couchdb/data
     healthcheck:
       test: ["CMD-SHELL", "curl --fail -s http://couchdb:5984/_up"]
       interval: 30s
@@ -36,3 +58,5 @@ services:
 networks:
   default:
     name: buddy-net
+volumes:
+    buddy-data:

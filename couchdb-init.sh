@@ -25,6 +25,6 @@ curl -u $CDB_USER:$CDB_PWD -X PUT http://127.0.0.1:5984/_global_changes
 # Create the Single Node Database
 # see: https://docs.couchdb.org/en/stable/api/database/common.html
 echo "Creating `buddy` partitioned database on a single node cluster..."
-curl -u $CDB_USER:$CDB_PWD -X PUT http://127.0.0.1:5984/buddy?partitioned=true
+curl -u $CDB_USER:$CDB_PWD -X PUT http://127.0.0.1:5984/buddy-db?partitioned=true
 
 echo "Finished initializing your CouchDB database!"
